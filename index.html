@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Node Proxy Switch</title>
+
+    <link rel="stylesheet" href="./node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="./style.css">
+
+    <script>let $ = require('jquery');</script>
+    <script>require('popper.js');</script>
+    <script>require('bootstrap');</script>
+</head>
+
+<body>
+    <div class="container">
+
+        <div class="row">
+            <h1>Node Proxy Switch</h1>
+        </div>
+
+        <div class="row">
+            <div class="input-group mb-3 border border-secondary rounded">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" id="basic-addon3">proxy</span>
+                </div>
+                <input id="http-proxy" type="text" class="form-control" aria-describedby="basic-addon3">
+            </div>
+            <div class="input-group mb-3 border border-secondary rounded">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" id="basic-addon3">https-proxy</span>
+                </div>
+                <input id="https-proxy" type="text" class="form-control" aria-describedby="basic-addon3">
+            </div>
+        </div>
+
+        <div class="row">
+            <button type="button" class="btn btn-lg btn-block border border-secondary rounded"
+                onclick="applyProxySettings()">Apply
+                Proxy Settings</button>
+        </div>
+
+        <div class="row">
+            <button id="enableProxyBtn" type="button" class="btn btn-lg btn-block border border-secondary rounded"
+                onclick="enableProxySettings()">Enable
+                Proxy Settings</button>
+        </div>
+
+        <div class="row">
+            <button id="disableProxyBtn" type="button" class="btn btn-lg btn-block border border-secondary rounded"
+                onclick="disableProxySettings()">Disable
+                Proxy Settings</button>
+        </div>
+    </div>
+
+    <script src="index.js"></script>
+</body>
+
+</html>

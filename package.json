@@ -1,0 +1,24 @@
+{
+  "name": "node-proxy-switch",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron . --enable-logging"
+  },
+  "keywords": [],
+  "author": {
+    "name": "DEDaniel",
+    "email": "git@d-moellmann.de"
+  },
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^7.1.2",
+    "electron-builder": "^21.2.0"
+  },
+  "dependencies": {
+    "bootstrap": "^4.4.1",
+    "jquery": "^3.4.1",
+    "popper.js": "^1.16.0"
+  }
+}

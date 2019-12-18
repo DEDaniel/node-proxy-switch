@@ -1,0 +1,19 @@
+html, body {
+    padding: 10px;
+}
+
+.input-group-prepend {
+    width: 110px;
+}
+
+.input-group-text {
+    width: 100%;
+}
+
+.btn {
+    background-color: #e9ecef;
+    color: #495057;
+    margin-bottom: 15px;
+    padding: 6px 0;
+    height: 38px;
+}
