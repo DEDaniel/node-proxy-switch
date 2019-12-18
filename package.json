@@ -1,12 +1,17 @@
 {
   "name": "node-proxy-switch",
   "version": "1.0.0",
-  "description": "",
+  "description": "Change your npm proxy settings on the fly!",
   "main": "main.js",
   "scripts": {
     "start": "electron . --enable-logging"
   },
-  "keywords": [],
+  "keywords": [
+    "node",
+    "proxy",
+    "switch",
+    "electron"
+  ],
   "author": {
     "name": "DEDaniel",
     "email": "git@d-moellmann.de"
