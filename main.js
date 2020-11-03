@@ -22,10 +22,14 @@ app.on('ready', () => {
     updateFileStatus();
 
     mainWindow = new BrowserWindow({
-        width: 390,
+        width: 400,
         height: 315,
         show: false,
         alwaysOnTop: true,
+        autoHideMenuBar: true,
+        frame: false,
+        transparent: true,
+        resizable: false,
         webPreferences: {
             nodeIntegration: true
         }
@@ -60,7 +64,7 @@ app.on('quit', () => {
 createTray = () => {
     console.log('createTray', httpProxyStatus);
 
-    tray = new Tray(nativeImage.createFromPath(path.join(__dirname, nativeTheme.shouldUseDarkColors ? '/assets/icon-white.png' : '/assets/icon.png')));
+    tray = new Tray(nativeImage.createFromPath(path.join(__dirname, nativeTheme.shouldUseDarkColors ? '/assets/icon.png' : '/assets/icon-white.png')));
     setTrayImage(httpProxyStatus);
 
     const contextMenu = Menu.buildFromTemplate([
@@ -78,9 +82,9 @@ setTrayImage = (isProxyActive) => {
 
     let image;
     if (isProxyActive) {
-        image = nativeImage.createFromPath(path.join(__dirname, nativeTheme.shouldUseDarkColors ? '/assets/icon-white.png' : '/assets/icon.png'));
+        image = nativeImage.createFromPath(path.join(__dirname, nativeTheme.shouldUseDarkColors ?  '/assets/icon.png' : '/assets/icon-white.png'));
     } else {
-        image = nativeImage.createFromPath(path.join(__dirname, nativeTheme.shouldUseDarkColors ? '/assets/icon-white-disabled.png' : '/assets/icon-disabled.png'));
+        image = nativeImage.createFromPath(path.join(__dirname, nativeTheme.shouldUseDarkColors ?  '/assets/icon-disabled.png' : '/assets/icon-white-disabled.png'));
     }
 
     if (!isWindows) image = image.resize({ width: 25 });
@@ -97,7 +101,7 @@ openSettings = () => {
         isProxyActive: httpProxyStatus
     });
 
-    mainWindow.show();
+    mainWindow.isVisible() ? mainWindow.hide() : mainWindow.show();
 }
 
 enableProxy = () => {
