@@ -4,7 +4,8 @@
   "description": "Change your npm proxy settings on the fly!",
   "main": "main.js",
   "scripts": {
-    "start": "electron . --enable-logging"
+    "start": "electron . --enable-logging",
+    "build:win": "electron-builder -w"
   },
   "keywords": [
     "node",
@@ -25,5 +26,26 @@
     "bootstrap": "^4.5.3",
     "jquery": "^3.5.1",
     "popper.js": "^1.16.1"
+  },
+  "build": {
+    "appId": "de.node.proxy.switch",
+    "files":["!dist/*","!README.md"],
+    "win": {
+      "publisherName": "DEDaniel",
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "rfc3161TimeStampServer": "http://timestamp.digicert.com"
+    },
+    "nsis": {
+      "perMachine": false,
+      "oneClick": true,
+      "deleteAppDataOnUninstall": true
+    }
   }
 }
