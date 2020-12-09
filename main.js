@@ -3,6 +3,7 @@ const path = require('path');
 const fs = require('fs');
 
 const isWindows = process.platform !== 'darwin';
+const PROTOCOL = 'nps';
 
 let mainWindow;
 let tray;
@@ -16,46 +17,107 @@ let currentHttpsProxy;
 let httpProxyStatus;
 let httpsProxyStatus;
 
-app.on('ready', () => {
+const gotTheLock = app.requestSingleInstanceLock()
 
-    // initial call
-    updateFileStatus();
-
-    mainWindow = new BrowserWindow({
-        width: 400,
-        height: 315,
-        show: false,
-        alwaysOnTop: true,
-        autoHideMenuBar: true,
-        frame: false,
-        transparent: true,
-        resizable: false,
-        webPreferences: {
-            nodeIntegration: true
+registerProtocolHandler = () => {
+    console.log(`try to set ${PROTOCOL} as default`)
+    // set protocol as default
+    if (process.defaultApp) {
+        if (process.argv.length >= 2) {
+            // client was started out of the development environment - need to change the path
+            app.setAsDefaultProtocolClient(PROTOCOL, process.execPath, [path.resolve(process.argv[1])])
         }
-    });
+    } else {
+        app.setAsDefaultProtocolClient(PROTOCOL)
+    }
+    console.log(`was it successfull?`, app.isDefaultProtocolClient(PROTOCOL))
+}
 
-    mainWindow.loadFile(path.join(__dirname, 'index.html'));
-    mainWindow.webContents.openDevTools();
-    mainWindow.on('closed', () => {
-        mainWindow = null;
-    });
+checkProtocolHandlerCall = (entry) => {
+    console.log('checkProtocolHandlerCall start', entry)
+    if (entry.startsWith(PROTOCOL) && entry.includes(':')) {
+        console.log(`checkProtocolHandlerCall success`, entry)
+        const arg = entry.split(':')[1]
+        if (arg === 'on') {
+            console.log('checkProtocolHandlerCall enableProxy')
+            enableProxy()
+        } else if (arg === 'off') {
+            console.log('checkProtocolHandlerCall disableProxy')
+            disableProxy()
+        } else {
+            console.log('checkProtocolHandlerCall failed to parse argument', arg)
+        }
+    } else {
+        console.log(`checkProtocolHandlerCall failed`, entry)
+    }
+}
 
-    mainWindow.webContents.once('dom-ready', () => {
-        console.log('ready to show', httpProxyStatus);
-        mainWindow.webContents.send('changed-proxy-settings', {
-            http: currentHttpProxy,
-            https: currentHttpsProxy,
-            isProxyActive: httpProxyStatus
+// to be registered before app ready event
+registerProtocolHandler();
+
+if (!gotTheLock) {
+    app.quit()
+} else {
+    app.on('second-instance', (event, cmd) => {
+        // protocol handler for windows
+        if (process.platform === 'win32') {
+            if (cmd.length > 0) {
+                cmd.forEach(entry => {
+                    checkProtocolHandlerCall(entry)
+                })
+            }
+        }
+        if (mainWindow) {
+            if (mainWindow.isMinimized()) {
+                mainWindow.restore()
+            }
+            mainWindow.focus()
+        }
+    }) // second-instance end
+
+    // app ready event has to be inside of gotTheLock
+    // https://github.com/electron/electron/blob/master/docs/api/app.md#apprequestsingleinstancelock
+    app.on('ready', () => {
+
+        // initial call
+        updateFileStatus();
+
+        mainWindow = new BrowserWindow({
+            width: 400,
+            height: 315,
+            show: false,
+            alwaysOnTop: true,
+            autoHideMenuBar: true,
+            frame: false,
+            transparent: true,
+            resizable: false,
+            webPreferences: {
+                nodeIntegration: true
+            }
         });
-    });
 
-    // wait till we know the initial httpProxyStatus
-    // this will affect the menu item defaul selection (enabled or disabled)
-    setTimeout(() => {
-        createTray();
-    }, 100);
-});
+        mainWindow.loadFile(path.join(__dirname, 'index.html'));
+        mainWindow.webContents.openDevTools();
+        mainWindow.on('closed', () => {
+            mainWindow = null;
+        });
+
+        mainWindow.webContents.once('dom-ready', () => {
+            console.log('ready to show', httpProxyStatus);
+            mainWindow.webContents.send('changed-proxy-settings', {
+                http: currentHttpProxy,
+                https: currentHttpsProxy,
+                isProxyActive: httpProxyStatus
+            });
+        });
+
+        // wait till we know the initial httpProxyStatus
+        // this will affect the menu item defaul selection (enabled or disabled)
+        setTimeout(() => {
+            createTray();
+        }, 100);
+    });
+}
 
 app.on('quit', () => {
     app.quit();
@@ -82,9 +144,9 @@ setTrayImage = (isProxyActive) => {
 
     let image;
     if (isProxyActive) {
-        image = nativeImage.createFromPath(path.join(__dirname, nativeTheme.shouldUseDarkColors ?  '/assets/icon.png' : '/assets/icon-white.png'));
+        image = nativeImage.createFromPath(path.join(__dirname, nativeTheme.shouldUseDarkColors ? '/assets/icon.png' : '/assets/icon-white.png'));
     } else {
-        image = nativeImage.createFromPath(path.join(__dirname, nativeTheme.shouldUseDarkColors ?  '/assets/icon-disabled.png' : '/assets/icon-white-disabled.png'));
+        image = nativeImage.createFromPath(path.join(__dirname, nativeTheme.shouldUseDarkColors ? '/assets/icon-disabled.png' : '/assets/icon-white-disabled.png'));
     }
 
     if (!isWindows) image = image.resize({ width: 25 });
